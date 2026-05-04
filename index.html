@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final 450 — DSA Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --border2: #2e2e2e;
+    --accent: #00ff88;
+    --accent-dim: rgba(0,255,136,0.12);
+    --accent-dim2: rgba(0,255,136,0.06);
+    --amber: #ffb800;
+    --amber-dim: rgba(255,184,0,0.12);
+    --text: #f0f0f0;
+    --text2: #888;
+    --text3: #444;
+    --red: #ff4444;
+    --blue: #4488ff;
+    --blue-dim: rgba(68,136,255,0.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── HEADER ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .header-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .h-stat {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  .h-stat span {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .h-progress {
+    flex: 1;
+    max-width: 200px;
+    height: 3px;
+    background: var(--border2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .h-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  .h-pct {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    margin-bottom: 2.5rem;
+    padding: 2rem 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-title .dim { color: var(--text3); }
+
+  .hero-sub {
+    font-size: 14px;
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+
+  /* ── STATS CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.total::before { background: var(--text3); }
+  .stat-card.solved::before { background: var(--accent); }
+  .stat-card.remaining::before { background: var(--blue); }
+  .stat-card.revision::before { background: var(--amber); }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card.solved .stat-num { color: var(--accent); }
+  .stat-card.remaining .stat-num { color: var(--blue); }
+  .stat-card.revision .stat-num { color: var(--amber); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text2);
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 13px;
+    pointer-events: none;
+    font-family: var(--mono);
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 8px 12px 8px 30px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+
+  .topic-select {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .filter-pills {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3px;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+
+  .pill:hover { color: var(--text); }
+  .pill.active { background: var(--accent); color: #000; font-weight: 700; }
+  .pill.active-rev { background: var(--amber); color: #000; font-weight: 700; }
+  .pill.active-solved { background: var(--accent); color: #000; font-weight: 700; }
+  .pill.active-todo { background: var(--blue); color: #000; font-weight: 700; }
+
+  /* ── TOPIC SECTIONS ── */
+  .topics { display: flex; flex-direction: column; gap: 10px; }
+
+  .topic-section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .topic-section:hover { border-color: var(--border2); }
+
+  .topic-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.875rem 1.125rem;
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .topic-header:hover { background: var(--surface2); }
+
+  .topic-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--border2);
+    transition: background 0.3s;
+  }
+
+  .topic-dot.partial { background: var(--amber); }
+  .topic-dot.complete { background: var(--accent); }
+
+  .topic-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .topic-bar-wrap {
+    flex: 0 0 120px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .topic-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.5s;
+  }
+
+  .topic-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .topic-chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--text3);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .topic-chevron.open { transform: rotate(90deg); }
+
+  .topic-body { display: none; }
+  .topic-body.open { display: block; }
+
+  /* ── PROBLEM ROWS ── */
+  .problem-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 1.125rem;
+    border-top: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  .problem-row:hover { background: var(--surface2); }
+
+  .cb-wrap {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+  }
+
+  .cb-wrap:hover { border-color: var(--accent); }
+  .cb-wrap.checked { background: var(--accent); border-color: var(--accent); }
+
+  .cb-check {
+    display: none;
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    font-family: var(--mono);
+  }
+
+  .cb-wrap.checked .cb-check { display: block; }
+
+  .problem-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+    transition: color 0.2s;
+  }
+
+  .problem-name.done {
+    color: var(--text3);
+    text-decoration: line-through;
+    text-decoration-color: var(--text3);
+  }
+
+  .lc-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--blue-dim);
+    color: var(--blue);
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  .lc-link:hover { background: rgba(68,136,255,0.25); }
+
+  .rev-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .rev-btn:hover { border-color: var(--amber); color: var(--amber); }
+  .rev-btn.flagged { background: var(--amber-dim); color: var(--amber); border-color: transparent; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .reset-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--red);
+    background: transparent;
+    border: 1px solid rgba(255,68,68,0.3);
+    border-radius: var(--radius);
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    opacity: 0.6;
+  }
+
+  .reset-btn:hover { opacity: 1; background: rgba(255,68,68,0.08); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .h-progress { display: none; }
+    .h-stat.hide-mob { display: none; }
+    .topic-bar-wrap { display: none; }
+    .hero-title { font-size: 28px; }
+  }
+
+  @media (max-width: 400px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .controls { flex-direction: column; }
+    .search-wrap { width: 100%; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .topic-section {
+    animation: fadeIn 0.3s ease both;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">DSA/450</div>
+  <div class="header-stats">
+    <div class="h-stat hide-mob">solved <span id="h-done">0</span></div>
+    <div class="h-progress"><div class="h-progress-fill" id="h-bar" style="width:0%"></div></div>
+    <div class="h-pct" id="h-pct">0%</div>
+    <div class="h-stat hide-mob">remaining <span id="h-left">450</span></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="hero">
+    <div class="hero-tag">Love Babbar's curated sheet</div>
+    <h1 class="hero-title">Final 450 <span class="dim">DSA Tracker</span></h1>
+    <div class="hero-sub">Track your progress · Mark for revision · Filter by topic</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card total">
+      <div class="stat-num" id="s-total">450</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card solved">
+      <div class="stat-num" id="s-done">0</div>
+      <div class="stat-label">Solved</div>
+    </div>
+    <div class="stat-card remaining">
+      <div class="stat-num" id="s-left">450</div>
+      <div class="stat-label">Remaining</div>
+    </div>
+    <div class="stat-card revision">
+      <div class="stat-num" id="s-rev">0</div>
+      <div class="stat-label">Revision</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">/</span>
+      <input class="search-input" id="search" type="text" placeholder="search problems..." oninput="renderAll()">
+    </div>
+    <select class="topic-select" id="topic-filter" onchange="renderAll()">
+      <option value="">All topics</option>
+    </select>
+    <div class="filter-pills">
+      <button class="pill active" id="pill-all" onclick="setFilter('all',this)">All</button>
+      <button class="pill" id="pill-todo" onclick="setFilter('todo',this)">Unsolved</button>
+      <button class="pill" id="pill-done" onclick="setFilter('done',this)">Solved</button>
+      <button class="pill" id="pill-rev" onclick="setFilter('rev',this)">Revision</button>
+    </div>
+  </div>
+
+  <div class="topics" id="topics"></div>
+
+  <div class="footer">
+    <span>Progress saved in your browser · <span id="f-pct">0%</span> complete</span>
+    <button class="reset-btn" onclick="resetAll()">Reset all progress</button>
+  </div>
+</main>
+
+<script>
+const DATA = [
+  {topic:"Array",problems:[
+    "Reverse the array","Find the maximum and minimum element in an array","Find the Kth max and min element of an array [LC 215]",
+    "Sort array of 0s, 1s and 2s — Dutch National Flag [LC 75]","Move all negative elements to one side",
+    "Find Union and Intersection of two sorted arrays [LC 349]","Cyclically rotate an array by one [LC 189]",
+    "Largest sum contiguous subarray — Kadane's Algo [V.IMP] [LC 53]","Minimise the maximum difference between heights [V.IMP]",
+    "Minimum no. of jumps to reach end of array [LC 45]","Find duplicate in array of N+1 integers [LC 287]",
+    "Merge 2 sorted arrays without extra space [LC 88]","Merge Intervals [LC 56]","Next Permutation [LC 31]",
+    "Count Inversions [LC 493]","Best time to buy and sell stock [LC 121]",
+    "Find all pairs with sum equal to given number [LC 1]","Find common elements in 3 sorted arrays",
+    "Rearrange array in alternating positive and negative [LC 2149]","Find subarray with sum equal to 0 [LC 560]",
+    "Find factorial of a large number [LC 172]","Find maximum product subarray [LC 152]",
+    "Find longest consecutive subsequence [LC 128]","Find elements appearing more than n/k times [LC 229]",
+    "Maximum profit by buying and selling share atmost twice [LC 123]","Find whether an array is subset of another array",
+    "Find triplet that sums to given value [LC 15]","Trapping Rain Water [LC 42]","Chocolate Distribution Problem",
+    "Smallest subarray with sum greater than given value [LC 209]","Three way partitioning around a given value [LC 75]",
+    "Minimum swaps to bring elements ≤ K together","Minimum operations to make array palindrome",
+    "Median of 2 sorted arrays of equal size [LC 4]","Median of 2 sorted arrays of different size [LC 4]"
+  ]},
+  {topic:"Matrix",problems:[
+    "Spiral traversal on a Matrix [LC 54]","Search an element in a matrix [LC 74]",
+    "Find median in a row-wise sorted matrix [LC 240]","Find row with maximum no. of 1s",
+    "Print elements in sorted order from row-col sorted matrix","Maximum size rectangle [LC 85]",
+    "Find a specific pair in matrix","Rotate matrix by 90 degrees [LC 48]",
+    "Kth smallest element in row-column sorted matrix [LC 378]","Common elements in all rows of given matrix"
+  ]},
+  {topic:"Stacks & Queues",problems:[
+    "Implement Stack from Scratch","Implement Queue from Scratch","Implement 2 stacks in an array",
+    "Find the middle element of a stack","Implement N stacks in an Array","Valid or Balanced parenthesis",
+    "Reverse a String using Stack","Stack that supports getMin() in O(1) time and O(1) space",
+    "Find the next Greater element","The Celebrity Problem","Arithmetic Expression evaluation",
+    "Evaluation of Postfix expression","Insert element at bottom without other data structure",
+    "Reverse a stack using recursion","Sort a Stack using recursion","Merge Overlapping Intervals",
+    "Largest rectangular Area in Histogram","Length of the Longest Valid Substring",
+    "Expression contains redundant bracket or not","Implement Stack using Queue","Implement Stack using Deque",
+    "Stack Permutations","Implement Queue using Stack","Implement n queue in an array",
+    "Implement a Circular queue","LRU Cache Implementation","Reverse a Queue using recursion",
+    "Reverse the first K elements of a queue","Interleave first half of queue with second half",
+    "First circular tour that visits all Petrol Pumps","Minimum time required to rot all oranges",
+    "Distance of nearest cell having 1 in binary matrix","First negative integer in every window of size k",
+    "Check if all levels of two trees are anagrams","Sum of min and max of all subarrays of size k",
+    "Minimum sum of squares of char counts after removing k chars",
+    "Queue based approach for first non-repeating character in stream","Next Smaller Element"
+  ]},
+  {topic:"LinkedList",problems:[
+    "Reverse the Linked List (iterative and recursive)","Reverse a Linked List in group of Given Size [V.IMP]",
+    "Detect loop in a linked list","Delete loop in a linked list","Find starting point of the loop",
+    "Remove Duplicates in a sorted Linked List","Remove Duplicates in an unsorted Linked List",
+    "Move the last element to Front in a Linked List","Add 1 to number represented as Linked List",
+    "Add two numbers represented by linked lists","Intersection of two Sorted Linked Lists",
+    "Intersection Point of two Linked Lists","Merge Sort for Linked Lists [V.IMP]",
+    "Quicksort for Linked Lists [V.IMP]","Find the middle element of a linked list",
+    "Check if a linked list is circular","Split a Circular linked list into two halves",
+    "Check whether Singly Linked list is a palindrome","Deletion from a Circular Linked List",
+    "Reverse a Doubly Linked list","Find pairs with given sum in a DLL",
+    "Count triplets in sorted DLL with sum equal to X","Sort a k-sorted Doubly Linked list [V.IMP]",
+    "Rotate DoublyLinked list by N nodes","Rotate a DLL in group of Given Size [V.IMP]",
+    "Can we reverse a linked list in less than O(n)?","Why Quicksort for Arrays and Merge Sort for LinkedLists?",
+    "Flatten a Linked List","Sort a LL of 0s, 1s and 2s","Clone a linked list with next and random pointer",
+    "Merge K sorted Linked lists","Multiply 2 numbers represented by LL",
+    "Delete nodes which have greater value on right side","Segregate even and odd nodes in a Linked List",
+    "Nth node from the end of a Linked List","First non-repeating character from a stream"
+  ]},
+  {topic:"Binary Trees",problems:[
+    "Level order traversal","Reverse Level Order traversal","Height of a tree","Diameter of a tree",
+    "Mirror of a tree","Inorder Traversal — recursive and iterative","Preorder Traversal — recursive and iterative",
+    "Postorder Traversal — recursive and iterative","Left View of a tree","Right View of a tree",
+    "Top View of a tree","Bottom View of a tree","Zig-Zag traversal of a binary tree",
+    "Check if a tree is balanced or not","Diagonal Traversal of a Binary tree",
+    "Boundary traversal of a Binary tree","Construct Binary Tree from String with Bracket Representation",
+    "Convert Binary tree into Doubly Linked List","Convert Binary tree into Sum tree",
+    "Construct Binary tree from Inorder and Preorder traversal",
+    "Find minimum swaps to convert Binary tree into BST","Check if Binary tree is Sum tree",
+    "Check if all leaf nodes are at same level","Check if Binary Tree contains duplicate subtrees of size 2+",
+    "Check if 2 trees are mirror or not","Sum of Nodes on Longest path from root to leaf",
+    "Check if given graph is tree or not [IMP]","Find Largest subtree sum in a tree",
+    "Maximum Sum of nodes — no two adjacent","Print all K-Sum paths in a Binary tree",
+    "Find LCA in a Binary tree","Find distance between 2 nodes in a Binary tree",
+    "Kth Ancestor of node in a Binary tree","Find all Duplicate subtrees in a Binary tree [IMP]",
+    "Tree Isomorphism Problem"
+  ]},
+  {topic:"Binary Search Trees",problems:[
+    "Find a value in a BST","Deletion of a node in a BST","Find min and max value in a BST",
+    "Find inorder successor and predecessor in a BST","Check if a tree is a BST or not",
+    "Populate Inorder successor of all nodes","Find LCA of 2 nodes in a BST",
+    "Construct BST from preorder traversal","Convert Binary tree into BST",
+    "Convert a normal BST into a Balanced BST","Merge two BST [V.V.V IMP]",
+    "Find Kth largest element in a BST","Find Kth smallest element in a BST",
+    "Count pairs from 2 BST whose sum equals X","Find the median of BST in O(n) time and O(1) space",
+    "Count BST nodes in a given range","Replace every element with least greater on its right",
+    "Find conflicting appointments","Check preorder is valid or not",
+    "Check whether BST contains Dead end","Largest BST in a Binary Tree [V.V.V.V.V IMP]",
+    "Flatten BST to sorted list"
+  ]},
+  {topic:"Greedy",problems:[
+    "Activity Selection Problem","Job Sequencing Problem","Huffman Coding","Water Connection Problem",
+    "Fractional Knapsack Problem","Minimum number of Coins","Maximum trains for which stoppage can be provided",
+    "Minimum Platforms Problem","Buy Maximum Stocks if i stocks can be bought on i-th day",
+    "Find the minimum and maximum amount to buy all N candies","Minimize Cash Flow among friends",
+    "Minimum Cost to cut a board into squares","Check if it is possible to survive on Island",
+    "Find maximum meetings in one room","Maximum product subset of an array",
+    "Maximize array sum after K negations","Maximize the sum of arr[i]*i",
+    "Maximum sum of absolute difference of an array","Maximize sum of consecutive differences in circular array",
+    "Minimum sum of absolute difference of pairs of two arrays","Shortest Job First (SJF) CPU Scheduling",
+    "Least Recently Used (LRU) Page Replacement algorithm","Smallest subset with sum greater than all other elements",
+    "Chocolate Distribution Problem","DEFKIN — Defense of a Kingdom","DIEHARD — DIE HARD",
+    "GERGOVIA — Wine trading in Gergovia","Picking Up Chicks","CHOCOLA — Chocolate",
+    "ARRANGE — Arranging Amplifiers","K Centers Problem","Minimum Cost of ropes",
+    "Find smallest number with given digits and digit sum","Rearrange chars such that no two adjacent are same",
+    "Find maximum sum possible equal sum of three stacks"
+  ]},
+  {topic:"BackTracking",problems:[
+    "Rat in a maze Problem","Printing all solutions in N-Queen Problem","Word Break Problem using Backtracking",
+    "Remove Invalid Parentheses","Sudoku Solver","m Coloring Problem",
+    "Print all palindromic partitions of a string","Subset Sum Problem","The Knight's tour problem",
+    "Tug of War","Find shortest safe route in a path with landmines","Combinational Sum",
+    "Find Maximum number possible by doing at-most K swaps","Print all permutations of a string",
+    "Find if there is a path of more than k length from source","Longest Possible Route in a Matrix with Hurdles",
+    "Print all possible paths from top-left to bottom-right","Partition of a set into K subsets with equal sum",
+    "Find the K-th Permutation Sequence of first N natural numbers"
+  ]},
+  {topic:"String",problems:[
+    "Reverse a String","Check whether a String is Palindrome or not","Find Duplicate characters in a string",
+    "Why strings are immutable in Java?","Check if one string is a rotation of another",
+    "Check if a string is valid shuffle of two strings","Count and Say problem","Longest Palindromic Substring",
+    "Find Longest Recurring Subsequence in String","Print all Subsequences of a string",
+    "Print all permutations of the given string","Split Binary string into substrings with equal 0s and 1s",
+    "Word Wrap Problem [VERY IMP]","Edit Distance [Very Imp]",
+    "Find next greater number with same set of digits [V.V IMP]","Balanced Parenthesis problem",
+    "Word break Problem [Very Imp]","Rabin Karp Algo","KMP Algo",
+    "Convert sentence to mobile numeric keypad sequence",
+    "Minimum number of bracket reversals to balance expression","Count All Palindromic Subsequence in a given String",
+    "Count of given string in 2D character array","Search a Word in a 2D Grid of characters",
+    "Boyer Moore Algorithm for Pattern Searching","Converting Roman Numerals to Decimal",
+    "Longest Common Prefix","Number of flips to make binary string alternate",
+    "Find the first repeated word in string","Minimum number of swaps for bracket balancing",
+    "Find the longest common subsequence between two strings",
+    "Generate all possible valid IP addresses from given string",
+    "Smallest window containing all characters of string itself",
+    "Rearrange chars so no two adjacent are same","Minimum chars to add at front to make palindrome",
+    "Print all anagrams together from sequence of words","Smallest window containing all chars of another string",
+    "Recursively remove all adjacent duplicates","String matching where one string contains wildcard chars",
+    "Function to find customers who could not get a computer",
+    "Transform one string to another using minimum operations","Check if two strings are isomorphic",
+    "Recursively print all sentences from list of word lists"
+  ]},
+  {topic:"Searching & Sorting",problems:[
+    "Find first and last positions of element in sorted array","Find a Fixed Point (value equal to index) in array",
+    "Search in a rotated sorted array","Square root of an integer",
+    "Maximum and minimum using minimum comparisons","Optimum location of point to minimize total distance",
+    "Find the repeating and the missing","Find majority element",
+    "Searching in array where adjacent differ by at most k","Find a pair with a given difference",
+    "Find four elements that sum to a given value","Maximum sum such that no 2 elements are adjacent",
+    "Count triplet with sum smaller than a given value","Merge 2 sorted arrays","Print all subarrays with 0 sum",
+    "Product array Puzzle","Sort array according to count of set bits",
+    "Minimum swaps required to sort the array","Bishu and Soldiers","Rasta and Kheshtak",
+    "Kth smallest number again","Find pivot element in a sorted array","K-th Element of Two Sorted Arrays",
+    "Aggressive cows","Book Allocation Problem","EKOSPOJ","Job Scheduling Algo","Missing Number in AP",
+    "Smallest number with atleast n trailing zeroes in factorial","Painters Partition Problem",
+    "ROTI-Prata SPOJ","DoubleHelix SPOJ","Subset Sums","Find the inversion count",
+    "Implement Merge-sort in-place","Partitioning and Sorting Arrays with Many Repeated Entries"
+  ]},
+  {topic:"Dynamic Programming",problems:[
+    "Coin Change Problem","Knapsack Problem","Binomial Coefficient Problem","Permutation Coefficient Problem",
+    "Program for nth Catalan Number","Matrix Chain Multiplication","Edit Distance","Subset Sum Problem",
+    "Friends Pairing Problem","Gold Mine Problem","Assembly Line Scheduling Problem","Painting the Fence problem",
+    "Maximize The Cut Segments","Longest Common Subsequence","Longest Repeated Subsequence",
+    "Longest Increasing Subsequence","Space Optimized Solution of LCS","LCS of three strings",
+    "Maximum Sum Increasing Subsequence","Count all subsequences having product less than K",
+    "Longest subsequence with difference between adjacent = 1",
+    "Maximum subsequence sum such that no three are consecutive","Egg Dropping Problem",
+    "Maximum Length Chain of Pairs","Maximum size square sub-matrix with all 1s",
+    "Maximum sum of pairs with specific difference","Min Cost Path Problem",
+    "Maximum difference of zeros and ones in binary string","Minimum number of jumps to reach end",
+    "Minimum cost to fill given weight in a bag","Minimum removals from array to make max−min ≤ K",
+    "Longest Common Substring","Count ways to reach given score in a game",
+    "Count Balanced Binary Trees of Height h","Largest Sum Contiguous Subarray [V.V.V.V IMP]",
+    "Smallest sum contiguous subarray","Unbounded Knapsack (Repetition allowed)","Word Break Problem",
+    "Largest Independent Set Problem","Partition problem","Longest Palindromic Subsequence",
+    "Count All Palindromic Subsequence in a given String","Longest Palindromic Substring",
+    "Longest alternating subsequence","Weighted Job Scheduling",
+    "Coin game winner where every player has three choices","Count Derangements [IMPORTANT]",
+    "Maximum profit by buying and selling share at most twice","Optimal Strategy for a Game",
+    "Optimal Binary Search Tree","Palindrome Partitioning Problem","Word Wrap Problem",
+    "Mobile Numeric Keypad Problem [IMP]","Boolean Parenthesization Problem",
+    "Largest rectangular sub-matrix whose sum is 0",
+    "Largest area rectangular sub-matrix with equal 1s and 0s [IMP]",
+    "Maximum sum rectangle in a 2D matrix","Maximum profit buying and selling share at most k times",
+    "Find if a string is interleaved of two other strings","Maximum Length of Pair Chain"
+  ]},
+  {topic:"Graph",problems:[
+    "Create a Graph, print it","Implement BFS algorithm","Implement DFS Algo",
+    "Detect Cycle in Directed Graph using BFS/DFS","Detect Cycle in UnDirected Graph using BFS/DFS",
+    "Search in a Maze","Minimum Step by Knight","Flood fill algo","Clone a graph",
+    "Making wired Connections","Word Ladder","Dijkstra algo","Implement Topological Sort",
+    "Minimum time for each job in a DAG","Find whether it is possible to finish all tasks",
+    "Find the no. of Islands","Find order of characters from alien language dictionary",
+    "Implement Kruskal's Algorithm","Implement Prim's Algorithm","Total no. of Spanning trees in a graph",
+    "Implement Bellman Ford Algorithm","Implement Floyd Warshall Algorithm",
+    "Travelling Salesman Problem","Graph Colouring Problem","Snake and Ladders Problem",
+    "Find bridge in a graph","Count Strongly connected Components — Kosaraju Algo",
+    "Check whether a graph is Bipartite or Not","Detect Negative cycle in a graph",
+    "Longest path in a Directed Acyclic Graph","Journey to the Moon","Cheapest Flights Within K Stops",
+    "Oliver and the Game","Water Jug problem using BFS",
+    "Find if there is a path of more than k length from source","M-Colouring Problem",
+    "Minimum edges to reverse to make path from source to destination",
+    "Paths to travel each node using each edge — Seven Bridges","Vertex Cover Problem",
+    "Chinese Postman or Route Inspection","Number of Triangles in Directed and Undirected Graph",
+    "Minimise cashflow among friends","Two Clique Problem"
+  ]},
+  {topic:"Heap",problems:[
+    "Implement a MaxHeap/MinHeap using arrays and recursion","Sort an Array using heap — HeapSort",
+    "Maximum of all subarrays of size k","K largest element in an array",
+    "Kth smallest and largest element in an unsorted array","Merge K sorted arrays [IMP]",
+    "Merge 2 Binary Max Heaps","Kth largest sum continuous subarrays","Reorganize strings",
+    "Merge K Sorted Linked Lists [V.IMP]","Smallest range in K Lists","Median in a stream of Integers",
+    "Check if a Binary Tree is Heap","Connect n ropes with minimum cost","Convert BST to Min Heap",
+    "Convert min heap to max heap","Rearrange chars so no two adjacent are same",
+    "Minimum sum of two numbers formed from digits of array"
+  ]},
+  {topic:"Trie",problems:[
+    "Construct a trie from scratch","Find shortest unique prefix for every word in a list",
+    "Word Break Problem — Trie solution","Given sequence of words, print all anagrams together",
+    "Implement a Phone Directory","Print unique rows in a given boolean matrix"
+  ]},
+  {topic:"Bit Manipulation",problems:[
+    "Count set bits in an integer","Find the two non-repeating elements in array of repeating elements",
+    "Count number of bits to be flipped to convert A to B","Count total set bits in all numbers from 1 to n",
+    "Program to find whether a number is power of two","Find position of the only set bit",
+    "Copy set bits in a range","Divide two integers without using *, / and mod",
+    "Calculate square without using *, / and pow()","Power Set"
+  ]}
+];
+
+const SK = 'f450_v2';
+let state = {};
+let activeFilter = 'all';
+
+function load() {
+  try { state = JSON.parse(localStorage.getItem(SK) || '{}'); } catch(e) { state = {}; }
+}
+function save() {
+  try { localStorage.setItem(SK, JSON.stringify(state)); } catch(e) {}
+}
+
+function key(topic, idx) { return topic + '::' + idx; }
+function isDone(k) { return !!(state[k] && state[k].d); }
+function isRev(k) { return !!(state[k] && state[k].r); }
+
+function toggleDone(topic, idx) {
+  const k = key(topic, idx);
+  if (!state[k]) state[k] = {};
+  state[k].d = !state[k].d;
+  save(); renderAll();
+}
+
+function toggleRev(topic, idx) {
+  const k = key(topic, idx);
+  if (!state[k]) state[k] = {};
+  state[k].r = !state[k].r;
+  save(); renderAll();
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+  btn.className = 'pill active';
+  renderAll();
+}
+
+function getStats() {
+  let total = 0, done = 0, rev = 0;
+  DATA.forEach(t => t.problems.forEach((p, i) => {
+    total++;
+    const k = key(t.topic, i);
+    if (isDone(k)) done++;
+    if (isRev(k)) rev++;
+  }));
+  return { total, done, rev };
+}
+
+function updateHeader(stats) {
+  const pct = Math.round(stats.done / stats.total * 100);
+  document.getElementById('h-done').textContent = stats.done;
+  document.getElementById('h-left').textContent = stats.total - stats.done;
+  document.getElementById('h-bar').style.width = pct + '%';
+  document.getElementById('h-pct').textContent = pct + '%';
+  document.getElementById('s-total').textContent = stats.total;
+  document.getElementById('s-done').textContent = stats.done;
+  document.getElementById('s-left').textContent = stats.total - stats.done;
+  document.getElementById('s-rev').textContent = stats.rev;
+  document.getElementById('f-pct').textContent = pct + '%';
+}
+
+function renderAll() {
+  const stats = getStats();
+  updateHeader(stats);
+
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  const topicF = document.getElementById('topic-filter').value;
+  const container = document.getElementById('topics');
+  container.innerHTML = '';
+
+  let anyVisible = false;
+
+  DATA.forEach((t, ti) => {
+    if (topicF && t.topic !== topicF) return;
+
+    const filtered = t.problems.map((p, i) => ({ p, i })).filter(({ p, i }) => {
+      const k = key(t.topic, i);
+      if (search && !p.toLowerCase().includes(search)) return false;
+      if (activeFilter === 'done' && !isDone(k)) return false;
+      if (activeFilter === 'todo' && isDone(k)) return false;
+      if (activeFilter === 'rev' && !isRev(k)) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) return;
+    anyVisible = true;
+
+    const total = t.problems.length;
+    const done = t.problems.filter((p, i) => isDone(key(t.topic, i))).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const dotClass = done === 0 ? '' : done === total ? 'complete' : 'partial';
+
+    const sec = document.createElement('div');
+    sec.className = 'topic-section';
+    sec.style.animationDelay = (ti * 0.03) + 's';
+
+    const rows = filtered.map(({ p, i }) => {
+      const k = key(t.topic, i);
+      const done = isDone(k);
+      const rev = isRev(k);
+      return `
+        <div class="problem-row">
+          <div class="cb-wrap ${done ? 'checked' : ''}" onclick="toggleDone('${t.topic}',${i})">
+            <span class="cb-check">✓</span>
+          </div>
+          <span class="problem-name ${done ? 'done' : ''}">${p}</span>
+          <button class="rev-btn ${rev ? 'flagged' : ''}" onclick="toggleRev('${t.topic}',${i})">${rev ? '★ rev' : '☆ rev'}</button>
+        </div>`;
+    }).join('');
+
+    sec.innerHTML = `
+      <div class="topic-header" onclick="toggleSec(this)">
+        <div class="topic-dot ${dotClass}"></div>
+        <div class="topic-name">${t.topic}</div>
+        <div class="topic-bar-wrap"><div class="topic-bar-fill" style="width:${pct}%"></div></div>
+        <div class="topic-count">${done}/${total}</div>
+        <svg class="topic-chevron" viewBox="0 0 16 16" fill="none">
+          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="topic-body">${rows}</div>`;
+
+    container.appendChild(sec);
+  });
+
+  if (!anyVisible) {
+    container.innerHTML = '<div class="empty">No problems match your filters.</div>';
+  }
+}
+
+function toggleSec(header) {
+  const body = header.nextElementSibling;
+  const chev = header.querySelector('.topic-chevron');
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+function resetAll() {
+  if (confirm('Reset ALL progress? This cannot be undone.')) {
+    state = {};
+    save();
+    renderAll();
+  }
+}
+
+function init() {
+  load();
+  const sel = document.getElementById('topic-filter');
+  DATA.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.topic;
+    o.textContent = t.topic;
+    sel.appendChild(o);
+  });
+  renderAll();
+}
+
+init();
+</script>
+</body>
+</html>
