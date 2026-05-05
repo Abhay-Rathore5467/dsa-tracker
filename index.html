@@ -6,564 +6,382 @@
 <title>Final 450 — DSA Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #222222;
-    --border2: #2e2e2e;
-    --accent: #00ff88;
-    --accent-dim: rgba(0,255,136,0.12);
-    --accent-dim2: rgba(0,255,136,0.06);
-    --amber: #ffb800;
-    --amber-dim: rgba(255,184,0,0.12);
-    --text: #f0f0f0;
-    --text2: #888;
-    --text3: #444;
-    --red: #ff4444;
-    --blue: #4488ff;
-    --blue-dim: rgba(68,136,255,0.12);
-    --radius: 8px;
-    --radius-lg: 12px;
-    --mono: 'JetBrains Mono', monospace;
-    --display: 'Syne', sans-serif;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--display);
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-
-  a { color: inherit; text-decoration: none; }
-
-  /* ── HEADER ── */
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    height: 56px;
-  }
-
-  .logo {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-
-  .header-stats {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-  }
-
-  .h-stat {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text2);
-    white-space: nowrap;
-  }
-
-  .h-stat span {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .h-progress {
-    flex: 1;
-    max-width: 200px;
-    height: 3px;
-    background: var(--border2);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .h-progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 99px;
-    transition: width 0.6s cubic-bezier(.4,0,.2,1);
-  }
-
-  .h-pct {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent);
-    white-space: nowrap;
-  }
-
-  /* ── MAIN ── */
-  .main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 4rem;
-  }
-
-  /* ── HERO ── */
-  .hero {
-    margin-bottom: 2.5rem;
-    padding: 2rem 0 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .hero-tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-
-  .hero-title {
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-  }
-
-  .hero-title .dim { color: var(--text3); }
-
-  .hero-sub {
-    font-size: 14px;
-    color: var(--text2);
-    font-family: var(--mono);
-  }
-
-  /* ── STATS CARDS ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-
-  .stat-card.total::before { background: var(--text3); }
-  .stat-card.solved::before { background: var(--accent); }
-  .stat-card.remaining::before { background: var(--blue); }
-  .stat-card.revision::before { background: var(--amber); }
-
-  .stat-num {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-card.solved .stat-num { color: var(--accent); }
-  .stat-card.remaining .stat-num { color: var(--blue); }
-  .stat-card.revision .stat-num { color: var(--amber); }
-
-  .stat-label {
-    font-size: 11px;
-    color: var(--text2);
-    font-family: var(--mono);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  /* ── CONTROLS ── */
-  .controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .search-wrap {
-    flex: 1;
-    min-width: 200px;
-    position: relative;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text3);
-    font-size: 13px;
-    pointer-events: none;
-    font-family: var(--mono);
-  }
-
-  .search-input {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 8px 12px 8px 30px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .search-input:focus { border-color: var(--accent); }
-  .search-input::placeholder { color: var(--text3); }
-
-  .topic-select {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 8px 12px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .filter-pills {
-    display: flex;
-    gap: 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 3px;
-  }
-
-  .pill {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 5px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.03em;
-  }
-
-  .pill:hover { color: var(--text); }
-  .pill.active { background: var(--accent); color: #000; font-weight: 700; }
-  .pill.active-rev { background: var(--amber); color: #000; font-weight: 700; }
-  .pill.active-solved { background: var(--accent); color: #000; font-weight: 700; }
-  .pill.active-todo { background: var(--blue); color: #000; font-weight: 700; }
-
-  /* ── TOPIC SECTIONS ── */
-  .topics { display: flex; flex-direction: column; gap: 10px; }
-
-  .topic-section {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .topic-section:hover { border-color: var(--border2); }
-
-  .topic-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.875rem 1.125rem;
-    background: var(--surface);
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
-  }
-
-  .topic-header:hover { background: var(--surface2); }
-
-  .topic-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: var(--border2);
-    transition: background 0.3s;
-  }
-
-  .topic-dot.partial { background: var(--amber); }
-  .topic-dot.complete { background: var(--accent); }
-
-  .topic-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    flex: 1;
-    letter-spacing: -0.01em;
-  }
-
-  .topic-bar-wrap {
-    flex: 0 0 120px;
-    height: 3px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .topic-bar-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 99px;
-    transition: width 0.5s;
-  }
-
-  .topic-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text2);
-    min-width: 44px;
-    text-align: right;
-  }
-
-  .topic-chevron {
-    width: 16px;
-    height: 16px;
-    color: var(--text3);
-    transition: transform 0.2s;
-    flex-shrink: 0;
-  }
-
-  .topic-chevron.open { transform: rotate(90deg); }
-
-  .topic-body { display: none; }
-  .topic-body.open { display: block; }
-
-  /* ── PROBLEM ROWS ── */
-  .problem-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 1.125rem;
-    border-top: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-
-  .problem-row:hover { background: var(--surface2); }
-
-  .cb-wrap {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    border: 1.5px solid var(--border2);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: transparent;
-  }
-
-  .cb-wrap:hover { border-color: var(--accent); }
-  .cb-wrap.checked { background: var(--accent); border-color: var(--accent); }
-
-  .cb-check {
-    display: none;
-    color: #000;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-    font-family: var(--mono);
-  }
-
-  .cb-wrap.checked .cb-check { display: block; }
-
-  .problem-name {
-    flex: 1;
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.4;
-    transition: color 0.2s;
-  }
-
-  .problem-name.done {
-    color: var(--text3);
-    text-decoration: line-through;
-    text-decoration-color: var(--text3);
-  }
-
-  .lc-link {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--blue-dim);
-    color: var(--blue);
-    white-space: nowrap;
-    transition: background 0.15s;
-  }
-
-  .lc-link:hover { background: rgba(68,136,255,0.25); }
-
-  .rev-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--text3);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
-  .rev-btn:hover { border-color: var(--amber); color: var(--amber); }
-  .rev-btn.flagged { background: var(--amber-dim); color: var(--amber); border-color: transparent; }
-
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text3);
-    font-family: var(--mono);
-    font-size: 13px;
-  }
-
-  /* ── FOOTER ── */
-  .footer {
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  .reset-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--red);
-    background: transparent;
-    border: 1px solid rgba(255,68,68,0.3);
-    border-radius: var(--radius);
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-    opacity: 0.6;
-  }
-
-  .reset-btn:hover { opacity: 1; background: rgba(255,68,68,0.08); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .h-progress { display: none; }
-    .h-stat.hide-mob { display: none; }
-    .topic-bar-wrap { display: none; }
-    .hero-title { font-size: 28px; }
-  }
-
-  @media (max-width: 400px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .controls { flex-direction: column; }
-    .search-wrap { width: 100%; }
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .topic-section {
-    animation: fadeIn 0.3s ease both;
-  }
+:root {
+  --bg: #090909;
+  --surface: #111;
+  --surface2: #181818;
+  --surface3: #1e1e1e;
+  --border: #1f1f1f;
+  --border2: #2a2a2a;
+  --accent: #00ff88;
+  --accent-dim: rgba(0,255,136,0.1);
+  --amber: #ffb800;
+  --amber-dim: rgba(255,184,0,0.1);
+  --red: #ff4455;
+  --red-dim: rgba(255,68,85,0.1);
+  --blue: #4d9fff;
+  --blue-dim: rgba(77,159,255,0.1);
+  --purple: #b06aff;
+  --purple-dim: rgba(176,106,255,0.1);
+  --text: #efefef;
+  --text2: #777;
+  --text3: #3a3a3a;
+  --easy: #00ff88;
+  --medium: #ffb800;
+  --hard: #ff4455;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Syne', sans-serif;
+  --r: 8px;
+  --rlg: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(9,9,9,0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 1.5rem; height: 54px;
+}
+.logo { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .1em; white-space: nowrap; }
+.h-bar-wrap { flex: 1; max-width: 180px; height: 3px; background: var(--border2); border-radius: 99px; overflow: hidden; }
+.h-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .6s; }
+.h-pct { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); }
+.h-nums { display: flex; gap: 1rem; margin-left: auto; }
+.h-num { font-family: var(--mono); font-size: 11px; color: var(--text2); white-space: nowrap; }
+.h-num b { color: var(--text); }
+
+/* streak */
+.streak-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--amber-dim); border: 1px solid rgba(255,184,0,.2);
+  border-radius: 99px; padding: 3px 10px;
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  white-space: nowrap;
+}
+
+/* ── MAIN ── */
+.main { max-width: 980px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+/* ── HERO ── */
+.hero { padding: 1.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 1.75rem; }
+.hero-tag { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .4rem; }
+.hero-title { font-size: clamp(26px,5vw,46px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-bottom: .6rem; }
+.hero-title .dim { color: var(--text3); }
+.hero-sub { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+
+/* ── DAILY GOAL RING ── */
+.top-widgets { display: grid; grid-template-columns: 1fr auto; gap: 1rem; margin-bottom: 1.5rem; align-items: start; }
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: .875rem 1rem; text-align: center; position: relative; overflow: hidden;
+}
+.stat-card::after { content:''; position:absolute; top:0;left:0;right:0;height:2px; }
+.stat-card.s-total::after { background: var(--text3); }
+.stat-card.s-solved::after { background: var(--accent); }
+.stat-card.s-left::after { background: var(--blue); }
+.stat-card.s-rev::after { background: var(--amber); }
+.stat-num { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+.s-solved .stat-num { color: var(--accent); }
+.s-left .stat-num { color: var(--blue); }
+.s-rev .stat-num { color: var(--amber); }
+.stat-label { font-size: 10px; color: var(--text2); font-family: var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+
+/* daily goal widget */
+.goal-widget {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  min-width: 130px;
+}
+.goal-ring-wrap { position: relative; width: 72px; height: 72px; }
+.goal-ring { transform: rotate(-90deg); }
+.goal-ring-track { fill: none; stroke: var(--border2); stroke-width: 5; }
+.goal-ring-fill { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset .5s; }
+.goal-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.goal-num { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--accent); line-height: 1; }
+.goal-denom { font-family: var(--mono); font-size: 9px; color: var(--text2); }
+.goal-label { font-family: var(--mono); font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; }
+.goal-set { display: flex; gap: 4px; align-items: center; }
+.goal-input {
+  width: 40px; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text); font-family: var(--mono); font-size: 11px;
+  padding: 3px 5px; text-align: center; outline: none;
+}
+.goal-input:focus { border-color: var(--accent); }
+.goal-set-btn {
+  font-family: var(--mono); font-size: 10px; padding: 3px 7px;
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid rgba(0,255,136,.2); border-radius: 4px; cursor: pointer;
+}
+
+/* ── CONTROLS ── */
+.controls { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-family: var(--mono); font-size: 12px; pointer-events: none; }
+.search-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: var(--mono); font-size: 13px;
+  padding: 8px 12px 8px 30px; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text3); }
+.topic-select {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r);
+  color: var(--text); font-family: var(--mono); font-size: 12px; padding: 8px 12px; outline: none; cursor: pointer;
+}
+.pills { display: flex; gap: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 3px; }
+.pill {
+  font-family: var(--mono); font-size: 11px; padding: 4px 10px; border-radius: 5px;
+  border: none; background: transparent; color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.pill:hover { color: var(--text); }
+.pill.p-active { background: var(--accent); color: #000; font-weight: 700; }
+.pill.p-rev { background: var(--amber); color: #000; font-weight: 700; }
+.pill.p-done { background: var(--accent); color: #000; font-weight: 700; }
+.pill.p-todo { background: var(--blue); color: #000; font-weight: 700; }
+.pill.p-hard-f { background: var(--red); color: #fff; font-weight: 700; }
+
+/* ── DIFF LEGEND ── */
+.diff-legend { display: flex; gap: 10px; margin-bottom: 1.25rem; align-items: center; }
+.diff-legend span { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+.dl-item { display: flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 11px; cursor: pointer; }
+.dl-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* ── TOPIC SECTIONS ── */
+.topics { display: flex; flex-direction: column; gap: 8px; }
+.topic-sec { border: 1px solid var(--border); border-radius: var(--rlg); overflow: hidden; animation: fadeUp .3s ease both; }
+.topic-sec:hover { border-color: var(--border2); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.topic-hd {
+  display: flex; align-items: center; gap: 10px;
+  padding: .8rem 1.1rem; background: var(--surface);
+  cursor: pointer; user-select: none; transition: background .15s;
+}
+.topic-hd:hover { background: var(--surface2); }
+.topic-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); flex-shrink: 0; transition: background .3s; }
+.topic-dot.partial { background: var(--amber); }
+.topic-dot.done { background: var(--accent); }
+.topic-name { font-size: 14px; font-weight: 700; flex: 1; letter-spacing: -.01em; }
+.topic-badge {
+  font-family: var(--mono); font-size: 9px; padding: 2px 7px;
+  background: var(--accent-dim); color: var(--accent);
+  border-radius: 99px; border: 1px solid rgba(0,255,136,.2);
+  display: none;
+}
+.topic-badge.show { display: inline-block; }
+.topic-mini-bar { flex: 0 0 100px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.topic-mini-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s; }
+.topic-cnt { font-family: var(--mono); font-size: 11px; color: var(--text2); min-width: 40px; text-align: right; }
+.topic-chev { width: 14px; height: 14px; color: var(--text3); transition: transform .2s; flex-shrink: 0; }
+.topic-chev.open { transform: rotate(90deg); }
+.topic-body { display: none; }
+.topic-body.open { display: block; }
+
+/* ── PROBLEM ROWS ── */
+.p-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 1.1rem; border-top: 1px solid var(--border);
+  transition: background .1s; position: relative;
+}
+.p-row:hover { background: var(--surface2); }
+.p-row.p-done-row { opacity: .55; }
+
+/* checkbox */
+.cb {
+  width: 17px; height: 17px; flex-shrink: 0;
+  border: 1.5px solid var(--border2); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; background: transparent;
+}
+.cb:hover { border-color: var(--accent); }
+.cb.on { background: var(--accent); border-color: var(--accent); }
+.cb-tick { display: none; color: #000; font-size: 10px; font-weight: 900; }
+.cb.on .cb-tick { display: block; }
+
+.p-name { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
+.p-name.struck { color: var(--text3); text-decoration: line-through; text-decoration-color: var(--text3); }
+
+/* difficulty tag */
+.diff-tag {
+  font-family: var(--mono); font-size: 9px; padding: 2px 7px;
+  border-radius: 99px; cursor: pointer; flex-shrink: 0;
+  border: 1px solid transparent; transition: all .15s; white-space: nowrap;
+}
+.diff-none { background: var(--surface3); color: var(--text2); border-color: var(--border2); }
+.diff-easy { background: rgba(0,255,136,.12); color: var(--easy); }
+.diff-medium { background: rgba(255,184,0,.12); color: var(--medium); }
+.diff-hard { background: rgba(255,68,85,.12); color: var(--hard); }
+
+/* revision */
+.rev-btn {
+  font-family: var(--mono); font-size: 10px; padding: 2px 8px;
+  border-radius: 4px; border: 1px solid var(--border2);
+  background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.rev-btn:hover { border-color: var(--amber); color: var(--amber); }
+.rev-btn.on { background: var(--amber-dim); color: var(--amber); border-color: transparent; }
+
+/* notes */
+.note-btn {
+  font-family: var(--mono); font-size: 10px; padding: 2px 8px;
+  border-radius: 4px; border: 1px solid var(--border2);
+  background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.note-btn:hover { border-color: var(--purple); color: var(--purple); }
+.note-btn.has-note { background: var(--purple-dim); color: var(--purple); border-color: transparent; }
+
+/* note expand */
+.note-area-wrap { display: none; padding: 6px 1.1rem 8px calc(1.1rem + 25px); border-top: 1px solid var(--border); background: var(--surface2); }
+.note-area-wrap.open { display: block; }
+.note-area {
+  width: 100%; background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 5px; color: var(--text); font-family: var(--mono); font-size: 12px;
+  padding: 6px 8px; resize: none; outline: none; line-height: 1.5; min-height: 52px;
+  transition: border-color .2s;
+}
+.note-area:focus { border-color: var(--purple); }
+.note-area::placeholder { color: var(--text3); }
+
+/* ── REVISION PANEL ── */
+.rev-panel {
+  background: var(--surface); border: 1px solid rgba(255,184,0,.2);
+  border-radius: var(--rlg); padding: 1.25rem; margin-bottom: 1.5rem;
+  display: none;
+}
+.rev-panel.show { display: block; }
+.rev-panel-title { font-family: var(--mono); font-size: 12px; color: var(--amber); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1rem; }
+.rev-list { display: flex; flex-direction: column; gap: 6px; }
+.rev-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; background: var(--surface2);
+  border-radius: 6px; font-size: 12px;
+}
+.rev-item-topic { font-family: var(--mono); font-size: 10px; color: var(--amber); flex-shrink: 0; }
+.rev-item-name { flex: 1; color: var(--text); }
+.rev-clear-btn {
+  font-family: var(--mono); font-size: 9px; padding: 2px 6px;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text3); border-radius: 4px; cursor: pointer;
+}
+.rev-clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── FOOTER ── */
+.footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.reset-btn {
+  font-family: var(--mono); font-size: 11px; color: var(--red);
+  background: transparent; border: 1px solid rgba(255,68,85,.25);
+  border-radius: var(--r); padding: 5px 12px; cursor: pointer; opacity: .6; transition: all .15s;
+}
+.reset-btn:hover { opacity: 1; background: var(--red-dim); }
+
+/* empty */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-family: var(--mono); font-size: 13px; }
+
+/* responsive */
+@media(max-width:640px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .top-widgets { grid-template-columns: 1fr; }
+  .goal-widget { flex-direction: row; justify-content: space-around; min-width: unset; }
+  .topic-mini-bar { display: none; }
+  .h-nums { display: none; }
+  .diff-legend { flex-wrap: wrap; }
+}
 </style>
 </head>
 <body>
 
-<header class="site-header">
+<header class="header">
   <div class="logo">DSA/450</div>
-  <div class="header-stats">
-    <div class="h-stat hide-mob">solved <span id="h-done">0</span></div>
-    <div class="h-progress"><div class="h-progress-fill" id="h-bar" style="width:0%"></div></div>
-    <div class="h-pct" id="h-pct">0%</div>
-    <div class="h-stat hide-mob">remaining <span id="h-left">450</span></div>
+  <div class="h-bar-wrap"><div class="h-bar-fill" id="hbar"></div></div>
+  <div class="h-pct" id="hpct">0%</div>
+  <div class="h-nums">
+    <div class="h-num">solved <b id="h-done">0</b></div>
+    <div class="h-num">left <b id="h-left">450</b></div>
   </div>
+  <div class="streak-pill" id="streak-pill">🔥 <span id="streak-num">0</span> day streak</div>
 </header>
 
 <main class="main">
   <div class="hero">
     <div class="hero-tag">Love Babbar's curated sheet</div>
     <h1 class="hero-title">Final 450 <span class="dim">DSA Tracker</span></h1>
-    <div class="hero-sub">Track your progress · Mark for revision · Filter by topic</div>
+    <div class="hero-sub">Difficulty tags · Revision queue · Notes · Daily goal · Streaks</div>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card total">
-      <div class="stat-num" id="s-total">450</div>
-      <div class="stat-label">Total</div>
+  <!-- STATS + GOAL -->
+  <div class="top-widgets">
+    <div class="stats-grid">
+      <div class="stat-card s-total"><div class="stat-num" id="s-total">450</div><div class="stat-label">Total</div></div>
+      <div class="stat-card s-solved"><div class="stat-num" id="s-done">0</div><div class="stat-label">Solved</div></div>
+      <div class="stat-card s-left"><div class="stat-num" id="s-left">450</div><div class="stat-label">Left</div></div>
+      <div class="stat-card s-rev"><div class="stat-num" id="s-rev">0</div><div class="stat-label">Revision</div></div>
     </div>
-    <div class="stat-card solved">
-      <div class="stat-num" id="s-done">0</div>
-      <div class="stat-label">Solved</div>
-    </div>
-    <div class="stat-card remaining">
-      <div class="stat-num" id="s-left">450</div>
-      <div class="stat-label">Remaining</div>
-    </div>
-    <div class="stat-card revision">
-      <div class="stat-num" id="s-rev">0</div>
-      <div class="stat-label">Revision</div>
+    <div class="goal-widget">
+      <div class="goal-label">Daily Goal</div>
+      <div class="goal-ring-wrap">
+        <svg class="goal-ring" width="72" height="72" viewBox="0 0 72 72">
+          <circle class="goal-ring-track" cx="36" cy="36" r="30"/>
+          <circle class="goal-ring-fill" id="goal-ring-fill" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        </svg>
+        <div class="goal-center">
+          <div class="goal-num" id="goal-today">0</div>
+          <div class="goal-denom">/ <span id="goal-target-disp">5</span></div>
+        </div>
+      </div>
+      <div class="goal-set">
+        <input class="goal-input" id="goal-input" type="number" min="1" max="50" value="5" placeholder="5">
+        <button class="goal-set-btn" onclick="setGoal()">Set</button>
+      </div>
     </div>
   </div>
 
+  <!-- REVISION PANEL -->
+  <div class="rev-panel" id="rev-panel">
+    <div class="rev-panel-title">⚡ Revision Queue</div>
+    <div class="rev-list" id="rev-list"></div>
+  </div>
+
+  <!-- CONTROLS -->
   <div class="controls">
     <div class="search-wrap">
       <span class="search-icon">/</span>
-      <input class="search-input" id="search" type="text" placeholder="search problems..." oninput="renderAll()">
+      <input class="search-input" id="search" placeholder="search problems..." oninput="renderAll()">
     </div>
-    <select class="topic-select" id="topic-filter" onchange="renderAll()">
-      <option value="">All topics</option>
-    </select>
-    <div class="filter-pills">
-      <button class="pill active" id="pill-all" onclick="setFilter('all',this)">All</button>
-      <button class="pill" id="pill-todo" onclick="setFilter('todo',this)">Unsolved</button>
-      <button class="pill" id="pill-done" onclick="setFilter('done',this)">Solved</button>
-      <button class="pill" id="pill-rev" onclick="setFilter('rev',this)">Revision</button>
+    <select class="topic-select" id="topic-filter" onchange="renderAll()"><option value="">All topics</option></select>
+    <div class="pills">
+      <button class="pill p-active" onclick="setFilter('all',this,'p-active')">All</button>
+      <button class="pill" onclick="setFilter('todo',this,'p-todo')">Unsolved</button>
+      <button class="pill" onclick="setFilter('done',this,'p-done')">Solved</button>
+      <button class="pill" onclick="setFilter('rev',this,'p-rev')">Revision</button>
+      <button class="pill" onclick="setFilter('hard',this,'p-hard-f')">Hard Only</button>
+      <button class="pill" onclick="setFilter('notes',this,'p-active')">Has Notes</button>
     </div>
+  </div>
+
+  <div class="diff-legend">
+    <span>Difficulty:</span>
+    <div class="dl-item" title="Filter easy"><div class="dl-dot" style="background:var(--easy)"></div><span style="color:var(--easy);font-family:var(--mono);font-size:11px">Easy</span></div>
+    <div class="dl-item" title="Filter medium"><div class="dl-dot" style="background:var(--medium)"></div><span style="color:var(--medium);font-family:var(--mono);font-size:11px">Medium</span></div>
+    <div class="dl-item" title="Filter hard"><div class="dl-dot" style="background:var(--hard)"></div><span style="color:var(--hard);font-family:var(--mono);font-size:11px">Hard</span></div>
+    <span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text2)">click difficulty tag on any problem to set it</span>
   </div>
 
   <div class="topics" id="topics"></div>
 
   <div class="footer">
-    <span>Progress saved in your browser · <span id="f-pct">0%</span> complete</span>
+    <span id="f-pct" style="font-family:var(--mono);font-size:11px;color:var(--text3)">0% complete · progress saved locally</span>
     <button class="reset-btn" onclick="resetAll()">Reset all progress</button>
   </div>
 </main>
@@ -571,29 +389,29 @@
 <script>
 const DATA = [
   {topic:"Array",problems:[
-    "Reverse the array","Find the maximum and minimum element in an array","Find the Kth max and min element of an array [LC 215]",
-    "Sort array of 0s, 1s and 2s — Dutch National Flag [LC 75]","Move all negative elements to one side",
-    "Find Union and Intersection of two sorted arrays [LC 349]","Cyclically rotate an array by one [LC 189]",
-    "Largest sum contiguous subarray — Kadane's Algo [V.IMP] [LC 53]","Minimise the maximum difference between heights [V.IMP]",
-    "Minimum no. of jumps to reach end of array [LC 45]","Find duplicate in array of N+1 integers [LC 287]",
-    "Merge 2 sorted arrays without extra space [LC 88]","Merge Intervals [LC 56]","Next Permutation [LC 31]",
-    "Count Inversions [LC 493]","Best time to buy and sell stock [LC 121]",
-    "Find all pairs with sum equal to given number [LC 1]","Find common elements in 3 sorted arrays",
-    "Rearrange array in alternating positive and negative [LC 2149]","Find subarray with sum equal to 0 [LC 560]",
-    "Find factorial of a large number [LC 172]","Find maximum product subarray [LC 152]",
-    "Find longest consecutive subsequence [LC 128]","Find elements appearing more than n/k times [LC 229]",
-    "Maximum profit by buying and selling share atmost twice [LC 123]","Find whether an array is subset of another array",
-    "Find triplet that sums to given value [LC 15]","Trapping Rain Water [LC 42]","Chocolate Distribution Problem",
-    "Smallest subarray with sum greater than given value [LC 209]","Three way partitioning around a given value [LC 75]",
+    "Reverse the array","Find the maximum and minimum element in an array","Find the Kth max and min element of an array",
+    "Sort array of 0s, 1s and 2s — Dutch National Flag","Move all negative elements to one side",
+    "Find Union and Intersection of two sorted arrays","Cyclically rotate an array by one",
+    "Largest sum contiguous subarray — Kadane's Algo [V.IMP]","Minimise the maximum difference between heights [V.IMP]",
+    "Minimum no. of jumps to reach end of array","Find duplicate in array of N+1 integers",
+    "Merge 2 sorted arrays without extra space","Merge Intervals","Next Permutation",
+    "Count Inversions","Best time to buy and sell stock",
+    "Find all pairs with sum equal to given number","Find common elements in 3 sorted arrays",
+    "Rearrange array in alternating positive and negative","Find subarray with sum equal to 0",
+    "Find factorial of a large number","Find maximum product subarray",
+    "Find longest consecutive subsequence","Find elements appearing more than n/k times",
+    "Maximum profit by buying and selling share atmost twice","Find whether an array is subset of another array",
+    "Find triplet that sums to given value","Trapping Rain Water","Chocolate Distribution Problem",
+    "Smallest subarray with sum greater than given value","Three way partitioning around a given value",
     "Minimum swaps to bring elements ≤ K together","Minimum operations to make array palindrome",
-    "Median of 2 sorted arrays of equal size [LC 4]","Median of 2 sorted arrays of different size [LC 4]"
+    "Median of 2 sorted arrays of equal size","Median of 2 sorted arrays of different size"
   ]},
   {topic:"Matrix",problems:[
-    "Spiral traversal on a Matrix [LC 54]","Search an element in a matrix [LC 74]",
-    "Find median in a row-wise sorted matrix [LC 240]","Find row with maximum no. of 1s",
-    "Print elements in sorted order from row-col sorted matrix","Maximum size rectangle [LC 85]",
-    "Find a specific pair in matrix","Rotate matrix by 90 degrees [LC 48]",
-    "Kth smallest element in row-column sorted matrix [LC 378]","Common elements in all rows of given matrix"
+    "Spiral traversal on a Matrix","Search an element in a matrix",
+    "Find median in a row-wise sorted matrix","Find row with maximum no. of 1s",
+    "Print elements in sorted order from row-col sorted matrix","Maximum size rectangle",
+    "Find a specific pair in matrix","Rotate matrix by 90 degrees",
+    "Kth smallest element in row-column sorted matrix","Common elements in all rows of given matrix"
   ]},
   {topic:"Stacks & Queues",problems:[
     "Implement Stack from Scratch","Implement Queue from Scratch","Implement 2 stacks in an array",
@@ -743,7 +561,7 @@ const DATA = [
     "Maximum Length Chain of Pairs","Maximum size square sub-matrix with all 1s",
     "Maximum sum of pairs with specific difference","Min Cost Path Problem",
     "Maximum difference of zeros and ones in binary string","Minimum number of jumps to reach end",
-    "Minimum cost to fill given weight in a bag","Minimum removals from array to make max−min ≤ K",
+    "Minimum cost to fill given weight in a bag","Minimum removals from array to make max-min ≤ K",
     "Longest Common Substring","Count ways to reach given score in a game",
     "Count Balanced Binary Trees of Height h","Largest Sum Contiguous Subarray [V.V.V.V IMP]",
     "Smallest sum contiguous subarray","Unbounded Knapsack (Repetition allowed)","Word Break Problem",
@@ -803,146 +621,292 @@ const DATA = [
   ]}
 ];
 
-const SK = 'f450_v2';
-let state = {};
-let activeFilter = 'all';
+const SK = 'f450_v3';
+let S = {}; // state
+let filter = 'all';
+let goalTarget = 5;
+let openNotes = new Set();
+let openSections = new Set();
 
 function load() {
-  try { state = JSON.parse(localStorage.getItem(SK) || '{}'); } catch(e) { state = {}; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(SK) || '{}');
+    S = raw.problems || {};
+    goalTarget = raw.goalTarget || 5;
+  } catch(e) { S = {}; }
 }
+
 function save() {
-  try { localStorage.setItem(SK, JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem(SK, JSON.stringify({ problems: S, goalTarget })); } catch(e) {}
 }
 
-function key(topic, idx) { return topic + '::' + idx; }
-function isDone(k) { return !!(state[k] && state[k].d); }
-function isRev(k) { return !!(state[k] && state[k].r); }
-
-function toggleDone(topic, idx) {
-  const k = key(topic, idx);
-  if (!state[k]) state[k] = {};
-  state[k].d = !state[k].d;
-  save(); renderAll();
+function k(topic, i) { return topic + '::' + i; }
+function get(topic, i) { return S[k(topic,i)] || {}; }
+function set(topic, i, patch) {
+  const key = k(topic, i);
+  S[key] = { ...S[key], ...patch };
+  save();
 }
 
-function toggleRev(topic, idx) {
-  const k = key(topic, idx);
-  if (!state[k]) state[k] = {};
-  state[k].r = !state[k].r;
-  save(); renderAll();
+// ── STREAK ──
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function updateStreak(didSolveToday) {
+  const sd = JSON.parse(localStorage.getItem('f450_streak') || '{"days":0,"last":""}');
+  const today = todayStr();
+  if (didSolveToday) {
+    if (sd.last === today) { /* already counted */ }
+    else if (sd.last === yesterday()) { sd.days++; sd.last = today; }
+    else { sd.days = 1; sd.last = today; }
+  }
+  localStorage.setItem('f450_streak', JSON.stringify(sd));
+  return sd.days;
 }
 
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
-  btn.className = 'pill active';
+function yesterday() {
+  const d = new Date(); d.setDate(d.getDate()-1);
+  return d.toISOString().slice(0,10);
+}
+
+// solved today count
+function solvedToday() {
+  let n = 0;
+  const today = todayStr();
+  Object.values(S).forEach(v => { if (v.solvedDate === today) n++; });
+  return n;
+}
+
+// ── STATS ──
+function getStats() {
+  let total=0,done=0,rev=0;
+  DATA.forEach(t => t.problems.forEach((_,i) => {
+    total++;
+    const v = get(t.topic,i);
+    if (v.d) done++;
+    if (v.r) rev++;
+  }));
+  return {total,done,rev};
+}
+
+function updateUI() {
+  const {total,done,rev} = getStats();
+  const pct = Math.round(done/total*100);
+  document.getElementById('hbar').style.width = pct+'%';
+  document.getElementById('hpct').textContent = pct+'%';
+  document.getElementById('h-done').textContent = done;
+  document.getElementById('h-left').textContent = total-done;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-left').textContent = total-done;
+  document.getElementById('s-rev').textContent = rev;
+  document.getElementById('f-pct').textContent = pct+'% complete · progress saved locally';
+
+  // streak
+  const today = todayStr();
+  const todayDone = done > 0 && Object.values(S).some(v => v.solvedDate === today);
+  const streak = updateStreak(todayDone);
+  document.getElementById('streak-num').textContent = streak;
+
+  // daily goal ring
+  const td = solvedToday();
+  document.getElementById('goal-today').textContent = td;
+  document.getElementById('goal-target-disp').textContent = goalTarget;
+  document.getElementById('goal-input').value = goalTarget;
+  const circ = 188.5;
+  const offset = circ - Math.min(td/goalTarget,1)*circ;
+  document.getElementById('goal-ring-fill').style.strokeDashoffset = offset;
+
+  // revision panel
+  renderRevPanel();
+}
+
+function renderRevPanel() {
+  const panel = document.getElementById('rev-panel');
+  const list = document.getElementById('rev-list');
+  const items = [];
+  DATA.forEach(t => t.problems.forEach((p,i) => {
+    if (get(t.topic,i).r) items.push({topic:t.topic,name:p,i});
+  }));
+  if (items.length === 0) { panel.classList.remove('show'); return; }
+  panel.classList.add('show');
+  list.innerHTML = items.map(it => `
+    <div class="rev-item">
+      <span class="rev-item-topic">${it.topic}</span>
+      <span class="rev-item-name">${it.name}</span>
+      <button class="rev-clear-btn" onclick="clearRev('${it.topic}',${it.i})">✕</button>
+    </div>`).join('');
+}
+
+function clearRev(topic, i) {
+  set(topic, i, {r:false});
   renderAll();
 }
 
-function getStats() {
-  let total = 0, done = 0, rev = 0;
-  DATA.forEach(t => t.problems.forEach((p, i) => {
-    total++;
-    const k = key(t.topic, i);
-    if (isDone(k)) done++;
-    if (isRev(k)) rev++;
-  }));
-  return { total, done, rev };
+// ── DIFF CYCLE ──
+const DIFFS = [null,'easy','medium','hard'];
+function cycleDiff(topic, i) {
+  const v = get(topic,i);
+  const cur = DIFFS.indexOf(v.diff||null);
+  const next = DIFFS[(cur+1)%DIFFS.length];
+  set(topic, i, {diff: next});
+  renderAll();
 }
 
-function updateHeader(stats) {
-  const pct = Math.round(stats.done / stats.total * 100);
-  document.getElementById('h-done').textContent = stats.done;
-  document.getElementById('h-left').textContent = stats.total - stats.done;
-  document.getElementById('h-bar').style.width = pct + '%';
-  document.getElementById('h-pct').textContent = pct + '%';
-  document.getElementById('s-total').textContent = stats.total;
-  document.getElementById('s-done').textContent = stats.done;
-  document.getElementById('s-left').textContent = stats.total - stats.done;
-  document.getElementById('s-rev').textContent = stats.rev;
-  document.getElementById('f-pct').textContent = pct + '%';
+function diffClass(d) {
+  if (d==='easy') return 'diff-easy';
+  if (d==='medium') return 'diff-medium';
+  if (d==='hard') return 'diff-hard';
+  return 'diff-none';
 }
 
+function diffLabel(d) {
+  if (d==='easy') return 'Easy';
+  if (d==='medium') return 'Med';
+  if (d==='hard') return 'Hard';
+  return '· · ·';
+}
+
+// ── ACTIONS ──
+function toggleDone(topic, i) {
+  const v = get(topic,i);
+  const newDone = !v.d;
+  set(topic, i, {d: newDone, solvedDate: newDone ? todayStr() : null});
+  renderAll();
+}
+
+function toggleRev(topic, i) {
+  const v = get(topic,i);
+  set(topic, i, {r: !v.r});
+  renderAll();
+}
+
+function toggleNote(topic, i) {
+  const id = k(topic,i);
+  if (openNotes.has(id)) openNotes.delete(id);
+  else openNotes.add(id);
+  renderAll();
+}
+
+function saveNote(topic, i, val) {
+  set(topic, i, {note: val.trim()});
+  // don't re-render on every keystroke
+}
+
+function setFilter(f, btn, cls) {
+  filter = f;
+  document.querySelectorAll('.pill').forEach(p => p.className='pill');
+  btn.className = 'pill ' + cls;
+  renderAll();
+}
+
+function setGoal() {
+  const v = parseInt(document.getElementById('goal-input').value)||5;
+  goalTarget = Math.max(1,Math.min(50,v));
+  save();
+  updateUI();
+}
+
+// ── RENDER ──
 function renderAll() {
-  const stats = getStats();
-  updateHeader(stats);
-
+  updateUI();
   const search = document.getElementById('search').value.toLowerCase().trim();
   const topicF = document.getElementById('topic-filter').value;
   const container = document.getElementById('topics');
+
+  // save which sections are currently open before wiping DOM
+  container.querySelectorAll('.topic-sec').forEach(sec => {
+    const body = sec.querySelector('.topic-body');
+    const name = sec.querySelector('.topic-name').textContent;
+    if (body && body.classList.contains('open')) openSections.add(name);
+    else openSections.delete(name);
+  });
+
   container.innerHTML = '';
+  let any = false;
 
-  let anyVisible = false;
-
-  DATA.forEach((t, ti) => {
+  DATA.forEach((t,ti) => {
     if (topicF && t.topic !== topicF) return;
 
-    const filtered = t.problems.map((p, i) => ({ p, i })).filter(({ p, i }) => {
-      const k = key(t.topic, i);
+    const filtered = t.problems.map((p,i) => ({p,i})).filter(({p,i}) => {
+      const v = get(t.topic,i);
       if (search && !p.toLowerCase().includes(search)) return false;
-      if (activeFilter === 'done' && !isDone(k)) return false;
-      if (activeFilter === 'todo' && isDone(k)) return false;
-      if (activeFilter === 'rev' && !isRev(k)) return false;
+      if (filter==='done' && !v.d) return false;
+      if (filter==='todo' && v.d) return false;
+      if (filter==='rev' && !v.r) return false;
+      if (filter==='hard' && v.diff!=='hard') return false;
+      if (filter==='notes' && !v.note) return false;
       return true;
     });
 
-    if (filtered.length === 0) return;
-    anyVisible = true;
+    if (!filtered.length) return;
+    any = true;
 
     const total = t.problems.length;
-    const done = t.problems.filter((p, i) => isDone(key(t.topic, i))).length;
-    const pct = total ? Math.round(done / total * 100) : 0;
-    const dotClass = done === 0 ? '' : done === total ? 'complete' : 'partial';
+    const doneCount = t.problems.filter((_,i) => get(t.topic,i).d).length;
+    const pct = total ? Math.round(doneCount/total*100) : 0;
+    const dotCls = doneCount===0?'':doneCount===total?'done':'partial';
+    const complete = doneCount===total;
 
-    const sec = document.createElement('div');
-    sec.className = 'topic-section';
-    sec.style.animationDelay = (ti * 0.03) + 's';
-
-    const rows = filtered.map(({ p, i }) => {
-      const k = key(t.topic, i);
-      const done = isDone(k);
-      const rev = isRev(k);
+    const rows = filtered.map(({p,i}) => {
+      const v = get(t.topic,i);
+      const noteOpen = openNotes.has(k(t.topic,i));
       return `
-        <div class="problem-row">
-          <div class="cb-wrap ${done ? 'checked' : ''}" onclick="toggleDone('${t.topic}',${i})">
-            <span class="cb-check">✓</span>
-          </div>
-          <span class="problem-name ${done ? 'done' : ''}">${p}</span>
-          <button class="rev-btn ${rev ? 'flagged' : ''}" onclick="toggleRev('${t.topic}',${i})">${rev ? '★ rev' : '☆ rev'}</button>
+        <div class="p-row ${v.d?'p-done-row':''}">
+          <div class="cb ${v.d?'on':''}" onclick="event.stopPropagation();toggleDone('${t.topic}',${i})"><span class="cb-tick">✓</span></div>
+          <span class="p-name ${v.d?'struck':''}">${p}</span>
+          <span class="diff-tag ${diffClass(v.diff||null)}" onclick="event.stopPropagation();cycleDiff('${t.topic}',${i})" title="Click to cycle difficulty">${diffLabel(v.diff||null)}</span>
+          <button class="rev-btn ${v.r?'on':''}" onclick="event.stopPropagation();toggleRev('${t.topic}',${i})">${v.r?'★':'☆'} rev</button>
+          <button class="note-btn ${v.note?'has-note':''}" onclick="event.stopPropagation();toggleNote('${t.topic}',${i})" title="Add note">${v.note?'📝':'+ note'}</button>
+        </div>
+        <div class="note-area-wrap ${noteOpen?'open':''}">
+          <textarea class="note-area" placeholder="Add your note, approach, link..." rows="2"
+            onchange="saveNote('${t.topic}',${i},this.value)"
+            oninput="saveNote('${t.topic}',${i},this.value)"
+          >${v.note||''}</textarea>
         </div>`;
     }).join('');
 
+    const sec = document.createElement('div');
+    sec.className = 'topic-sec';
+    sec.style.animationDelay = (ti*.025)+'s';
     sec.innerHTML = `
-      <div class="topic-header" onclick="toggleSec(this)">
-        <div class="topic-dot ${dotClass}"></div>
+      <div class="topic-hd" onclick="toggleSec(this)">
+        <div class="topic-dot ${dotCls}"></div>
         <div class="topic-name">${t.topic}</div>
-        <div class="topic-bar-wrap"><div class="topic-bar-fill" style="width:${pct}%"></div></div>
-        <div class="topic-count">${done}/${total}</div>
-        <svg class="topic-chevron" viewBox="0 0 16 16" fill="none">
+        <span class="topic-badge ${complete?'show':''}">DONE ✓</span>
+        <div class="topic-mini-bar"><div class="topic-mini-fill" style="width:${pct}%"></div></div>
+        <div class="topic-cnt">${doneCount}/${total}</div>
+        <svg class="topic-chev" viewBox="0 0 16 16" fill="none">
           <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="topic-body">${rows}</div>`;
-
     container.appendChild(sec);
+
+    // restore open state
+    if (openSections.has(t.topic)) {
+      sec.querySelector('.topic-body').classList.add('open');
+      sec.querySelector('.topic-chev').classList.add('open');
+    }
   });
 
-  if (!anyVisible) {
-    container.innerHTML = '<div class="empty">No problems match your filters.</div>';
-  }
+  if (!any) container.innerHTML = '<div class="empty">No problems match.</div>';
 }
 
-function toggleSec(header) {
-  const body = header.nextElementSibling;
-  const chev = header.querySelector('.topic-chevron');
+function toggleSec(hd) {
+  const body = hd.nextElementSibling;
+  const chev = hd.querySelector('.topic-chev');
+  const name = hd.querySelector('.topic-name').textContent;
   const open = body.classList.toggle('open');
   chev.classList.toggle('open', open);
+  if (open) openSections.add(name);
+  else openSections.delete(name);
 }
 
 function resetAll() {
-  if (confirm('Reset ALL progress? This cannot be undone.')) {
-    state = {};
-    save();
+  if (confirm('Reset ALL progress, notes and difficulty tags? This cannot be undone.')) {
+    S = {}; save();
+    localStorage.removeItem('f450_streak');
     renderAll();
   }
 }
@@ -952,8 +916,7 @@ function init() {
   const sel = document.getElementById('topic-filter');
   DATA.forEach(t => {
     const o = document.createElement('option');
-    o.value = t.topic;
-    o.textContent = t.topic;
+    o.value = t.topic; o.textContent = t.topic;
     sel.appendChild(o);
   });
   renderAll();
